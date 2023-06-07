@@ -1,19 +1,18 @@
 class Solution:
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> List[List[int]]:
-        if not root: return None
-        res = []
-        path = collections.deque() 
+        self.targetSum, self.ans = targetSum, []           
+        self.get_path_sum(root, 0, [])                      
+        return self.ans                                     
         
-        def dfs(node, s):
-            path.append(node.val)
-            s += node.val
-            if  not node.left and not node.right and s == targetSum:
-                res.append(list(path))
-			if node.left:
-                dfs(node.left, s)
-            if  node.right:
-                dfs(node.right, s)
-            s -= node.val
-            path.pop()
-		dfs(root, 0)
-        return res
+    def get_path_sum(self, root, psum, path):
+        if not root: return None                           
+        if not root.left and not root.right:                
+            if root.val + psum == self.targetSum:           
+                path.append(root.val)                       
+                self.ans.append([e for e in path])          
+                path.pop(-1)                                
+                return;                                     
+        path.append(root.val)                               
+        self.get_path_sum(root.left, psum + root.val, path) 
+        self.get_path_sum(root.right, psum + root.val, path)
+        path.pop(-1)                                        
