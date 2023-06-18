@@ -1,22 +1,21 @@
 class Solution:
-    def countPaths(self, grid: List[List[int]]) -> int:
-        noOfRows, noOfCols, res = len(grid), len(grid[0]), 0
-        dp = [[-1 for _ in range(noOfCols)] for _ in range(noOfRows)]
-        
-        def dfs(row: int, col: int, prev: int, dp: List[List[int]], grid: List[List[int]]) -> int:
-            directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-            if row < 0 or col < 0 or row >= len(grid) or col >= len(grid[0]) or grid[row][col] <= prev:
-                return 0
-            if dp[row][col] != -1: 
-                return dp[row][col]
-            ans = 1
-            for direction in directions:
-                newRow, newCol = row + direction[0], col + direction[1]
-                ans += dfs(newRow, newCol, grid[row][col], dp, grid)
-            dp[row][col] = ans
-            return ans
-        
-        for row in range(noOfRows):
-            for col in range(noOfCols):
-                res += dfs(row, col, -1, dp, grid)
-        return res % (10 ** 9 + 7)
+    def countPaths(self, grid):
+        rows = len(grid)
+        cols = len(grid[0])
+        mod = 10 ** 9 + 7
+
+        @lru_cache(None)
+        def count(row, col):
+            res = 1
+            for dx, dy in [[row, col + 1], [row, col - 1], [row + 1, col], [row - 1, col]]:
+                if 0 <= dx < rows and 0 <= dy < cols and grid[dx][dy] > grid[row][col]:
+                    res += count(dx, dy) % mod
+            return res
+
+        count_values = []
+        for i in range(rows):
+            for j in range(cols):
+                count_values.append(count(i, j))
+        path_sum = sum(count_values) % mod
+
+        return path_sum
